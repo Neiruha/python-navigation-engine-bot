@@ -16,11 +16,14 @@ from navigation.engine import NavigationEngine
 from navigation.api_stub import APISimulator
 
 # --- Конфигурация ---
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8354012195:AAF0WDGvFh3gX1wEbEOduat3g3nui8AbG-g")  # Замените на реальный токен или укажите в env
-# --- /Конфигурация ---
+#BOT_TOKEN = os.getenv("BOT_TOKEN", "8354012195:AAF0WDGvFh3gX1wEbEOduat3g3nui8AbG-g")  # Замените на реальный токен или укажите в env
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("Не установлен BOT_TOKEN. Укажите его в файле .env или в переменной окружения.")
 
 # Инициализация бота и диспетчера
 bot = Bot(token=BOT_TOKEN)
+
 dp = Dispatcher()
 
 # Инициализация навигационного движка
