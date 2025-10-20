@@ -1,0 +1,188 @@
+{
+  "defaults": {
+    "back_button_label": "< Назад",
+    "chat_mode": {
+      "finish_commands": ["/finish", "/start"],
+      "finish_button_label": "Закончить разговор"
+    },
+    "pagination": {
+      "page_size": 8,
+      "prev_label": "<<",
+      "next_label": ">>"
+    }
+  },
+  "screens": {
+    "main": {
+      "title": "Вы находитесь в главном меню",
+      "type": "static",
+      "buttons": [
+        { "label": "Мои треки", "target": "tracks" },
+        { "label": "Поставить отметки", "target": "quick_grade" },
+        { "label": "Ближайшие встречи", "target": "meetings" },
+        { "label": "Разговорный режим", "target": "chat_mode" },
+        { "label": "Мои предпочтения...", "target": "prefs" },
+        { "label": "Помощь от ИИ", "target": "ai_help" },
+        { "label": "Тест: Алфавит", "target": "alphabet" }
+      ]
+    },
+    "tracks": {
+      "title": "Ваши курсы (треки)",
+      "type": "dynamic",
+      "data_source": {
+        "url": "/api/teacher/tracks",
+        "method": "GET"
+      },
+      "button_template": {
+        "label_field": "name",
+        "target_screen": "track_detail",
+        "context_fields": {
+          "track_id": "id",
+          "track_name": "name"
+        }
+      },
+      "back_path": "main"
+    },
+    "track_detail": {
+      "title": "Трек: {{track_name}}",
+      "type": "static",
+      "buttons": [
+        { "label": "Настройка", "target": "track_settings" },
+        { "label": "Студенты", "target": "track_students" }
+      ],
+      "back_path": "tracks"
+    },
+    "track_settings": {
+      "title": "Настройки трека «{{track_name}}»",
+      "type": "static",
+      "buttons": [
+        { "label": "Изменить название", "action": "edit_name" },
+        { "label": "Изменить даты", "target": "track_dates" }
+      ],
+      "back_path": "track_detail"
+    },
+    "track_dates": {
+      "title": "Даты проведения",
+      "type": "static",
+      "buttons": [
+        { "label": "События", "target": "track_events" }
+      ],
+      "back_path": "track_settings"
+    },
+    "track_events": {
+      "title": "События в треке",
+      "type": "static",
+      "buttons": [
+        { "label": "Добавить по расписанию", "action": "add_recurring_event" },
+        { "label": "Добавить событие", "action": "add_one_time_event" }
+      ],
+      "back_path": "track_dates"
+    },
+    "track_students": {
+      "title": "Студенты в треке «{{track_name}}»",
+      "type": "dynamic",
+      "data_source": {
+        "url": "/api/tracks/{{track_id}}/students",
+        "method": "GET"
+      },
+      "button_template": {
+        "label_field": "full_name",
+        "target_screen": "student_profile",
+        "context_fields": {
+          "student_id": "id",
+          "student_name": "full_name"
+        }
+      },
+      "back_path": "track_detail"
+    },
+    "student_profile": {
+      "title": "Студент: {{student_name}}",
+      "type": "static",
+      "buttons": [
+        { "label": "Открыть профиль", "action": "open_full_profile" },
+        { "label": "Поставить отметку", "target": "select_metric" }
+      ],
+      "back_path": "track_students"
+    },
+    "select_metric": {
+      "title": "Выберите метрику для {{student_name}}",
+      "type": "dynamic",
+      "layout": "grid",
+      "columns": 3,
+      "supports_multi_select": false,
+      "data_source": {
+        "url": "/api/metrics",
+        "method": "GET"
+      },
+      "button_template": {
+        "label_field": "name",
+        "target_screen": "confirm_mark",
+        "context_fields": {
+          "metric_id": "id",
+          "metric_name": "name"
+        }
+      },
+      "back_path": "CONTEXTUAL"
+    },
+    "confirm_mark": {
+      "title": "Подтвердите: отметить {{student_name}} по метрике «{{metric_name}}»?",
+      "type": "static",
+      "buttons": [
+        { "label": "Да", "action": "submit_mark", "payload": "true" },
+        { "label": "Нет", "target": "select_metric" }
+      ],
+      "back_path": "select_metric"
+    },
+    "alphabet": {
+      "title": "Выберите букву фамилии студента",
+      "type": "static",
+      "paginated": true,
+      "supports_multi_select": false,
+      "items": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+      "back_path": "main"
+    },
+    "chat_mode": {
+      "title": "Вы вошли в разговорный режим. Задайте вопрос или опишите ситуацию.",
+      "type": "chat_input",
+      "back_path": "main",
+      "ai_api": {
+        "url": "/api/ai/teacher-assist",
+        "method": "POST",
+        "body_template": {
+          "user_id": "{{user_id}}",
+          "context": "{{chat_history}}",
+          "query": "{{user_message}}"
+        }
+      }
+    },
+    "ai_help": {
+      "title": "Опишите, в чём вам нужна помощь (например: «Как мотивировать отстающего?»)",
+      "type": "chat_input",
+      "back_path": "main",
+      "ai_api": {
+        "url": "/api/ai/help",
+        "method": "POST",
+        "body_template": {
+          "user_role": "teacher",
+          "request": "{{user_message}}"
+        }
+      }
+    },
+    "quick_grade": {
+      "title": "Быстрый выбор: для кого ставим отметку?",
+      "type": "dynamic",
+      "data_source": {
+        "url": "/api/teacher/recent_students",
+        "method": "GET"
+      },
+      "button_template": {
+        "label_field": "full_name",
+        "target_screen": "select_metric",
+        "context_fields": {
+          "student_id": "id",
+          "student_name": "full_name"
+        }
+      },
+      "back_path": "main"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "folders": {
+    "sources": [
+      {
+        "root": ".",
+        "include": ["*.py", "*.json"],
+        "exclude": [".git", ".py*", "__py*"]
+      }
+    ],
+    "output": "├── @.path"
+  },
+  "files": {
+    "sources": [
+      {
+        "root": ".",
+        "include": ["*.py","*.json"],
+        "exclude": []
+      }
+    ],
+    "output": "@.name\n---\n@.data"
+  }
+}
