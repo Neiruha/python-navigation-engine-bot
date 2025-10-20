@@ -15,6 +15,12 @@ from aiogram.filters import Command
 from navigation.engine import NavigationEngine
 from navigation.api_stub import APISimulator
 
+# Импортируем load_dotenv из python-dotenv
+from dotenv import load_dotenv
+
+# Загружаем переменные из .env файла
+load_dotenv()
+
 # --- Конфигурация ---
 #BOT_TOKEN = os.getenv("BOT_TOKEN", "8354012195:AAF0WDGvFh3gX1wEbEOduat3g3nui8AbG-g")  # Замените на реальный токен или укажите в env
 BOT_TOKEN = os.getenv("BOT_TOKEN")
